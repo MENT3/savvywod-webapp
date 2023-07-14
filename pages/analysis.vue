@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import colors from 'tailwindcss/colors'
 
 const config = useRuntimeConfig()
-const displayInPercent = ref(false)
+const analysisType = ref('time')
 const ChartsTimeBar = resolveComponent('ChartsTimeBar')
 const ChartsPercentBar = resolveComponent('ChartsPercentBar')
 
@@ -18,7 +18,7 @@ const chartData = computed(() => {
         borderWidth: 2,
         borderColor: colors.blue['800'],
         backgroundColor: colors.blue['700'],
-        data: analysis.value.round.map(rnd => rnd[`w_${displayInPercent.value ? 'percent' : 'duration'}`]),
+        data: analysis.value.round.map(rnd => rnd[`w_${analysisType.value == 'percent' ? 'percent' : 'duration'}`]),
         datalabels: { align: 'end', anchor: 'start' }
       },
       {
@@ -26,7 +26,7 @@ const chartData = computed(() => {
         borderWidth: 2,
         borderColor: colors.amber['600'],
         backgroundColor: colors.amber['500'],
-        data: analysis.value.round.map(rnd => rnd[`t_${displayInPercent.value ? 'percent' : 'duration'}`]),
+        data: analysis.value.round.map(rnd => rnd[`t_${analysisType.value == 'percent' ? 'percent' : 'duration'}`]),
         datalabels: { align: 'end', anchor: 'start' }
       }
     ]
@@ -36,8 +36,9 @@ const chartData = computed(() => {
 
 <template>
   <div>
-    <UToggle v-model="displayInPercent" />
-    <div>
+    <UiInlineSelector v-model="analysisType" :options="{ time: 'Temps', percent: 'Pourcentage' }" />
+
+    <div class="mt-7">
       <div class="mb-2 flex flex-col">
         <span class="block text-sm text-gray-500 uppercase">
           Vue d'ensemble
@@ -46,7 +47,7 @@ const chartData = computed(() => {
           Analyse par round
         </h3>
       </div>
-      <component :is="displayInPercent ? ChartsPercentBar : ChartsTimeBar" :data="chartData" />
+      <component :is="analysisType == 'percent' ? ChartsPercentBar : ChartsTimeBar" :data="chartData" />
     </div>
   </div>
 </template>
