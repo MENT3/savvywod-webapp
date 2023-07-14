@@ -28,9 +28,16 @@ const chartData = ref({
 
 <template>
   <div>
-    analysis page
     <div>
-      <ChartsBar :data="chartData" />
+      <div class="mb-2 flex flex-col">
+        <span class="block text-sm text-gray-500 uppercase">
+          Vue d'ensemble
+        </span>
+        <h3 class="text-lg">
+          Analyse par round
+        </h3>
+      </div>
+      <ChartsBar :data='chartData' />
     </div>
   </div>
 </template>

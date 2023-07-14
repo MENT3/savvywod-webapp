@@ -41,6 +41,11 @@ const options = {
       display: context => context.dataset.data[context.dataIndex] > 30,
       font: { weight: 'bold' },
       formatter: sec_2_min
+    },
+    legend: {
+      display: true,
+      position: 'bottom',
+      align: 'end'
     }
   }
 }
