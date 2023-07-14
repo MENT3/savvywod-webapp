@@ -1,53 +1,36 @@
 <script setup>
-import { Bar } from 'vue-chartjs'
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale
-} from 'chart.js'
-
 import { ref } from 'vue'
-ChartJS.register(
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale
-)
+import colors from 'tailwindcss/colors'
 
-const { data } = await useFetch("/api/data")
-
-const chartData = {
-  labels: ['January', 'February', 'March', 'April', 'May'],
+const { data: analysis } = await useAsyncData(() => $fetch(process.env.CORE_API_URL))
+const chartData = ref({
+  labels: analysis.value.map((_, i) => `Round ${i+1}`),
   datasets: [
     {
-      label: 'Data One',
-      backgroundColor: '#f87979',
-      data: [20, 20, 12, 50, 10]
+      label: 'Temps de travail',
+      borderWidth: 2,
+      borderColor: colors.blue['800'],
+      backgroundColor: colors.blue['700'],
+      data: analysis.value.map(rnd => rnd.w_duration),
+      datalabels: { align: 'end', anchor: 'start' }
+    },
+    {
+      label: 'Temps de transition',
+      borderWidth: 2,
+      borderColor: colors.amber['600'],
+      backgroundColor: colors.amber['500'],
+      data: analysis?.value?.map(rnd => rnd.t_duration),
+      datalabels: { align: 'end', anchor: 'start' }
     }
   ]
-}
-
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false
-}
+})
 </script>
 
 <template>
   <div>
     analysis page
     <div>
-      <Bar :data="chartData" :options="chartOptions" />
+      <ChartsBar :data="chartData" />
     </div>
-
-    <pre>
-      {{ data }}
-    </pre>
   </div>
 </template>
