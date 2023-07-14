@@ -20,14 +20,15 @@ ChartJS.register(
   CategoryScale,
   LinearScale
 )
-const sec2min = v => `${Math.floor(v/60).toString().padStart(2, '0')}:${(v%60).toString().padStart(2, '0')}`
-
 const props = defineProps({
   data: {
     type: Object,
     required: true
   }
 })
+
+const formatPercent = (v) => `${v*100}%`
+
 const options = {
   responsive: true,
   maintainAspectRatio: false,
@@ -36,17 +37,17 @@ const options = {
     y: {
       stacked: true,
       ticks: {
-        stepSize: 60,
-        callback: sec2min
+        stepSize: 0.2,
+        callback: formatPercent
       }
     }
   },
   plugins: {
     datalabels: {
       color: colors.white,
-      display: context => context.dataset.data[context.dataIndex] > 30,
+      display: context => context.dataset.data[context.dataIndex] > 0.1,
       font: { weight: 'bold' },
-      formatter: sec2min
+      formatter: formatPercent
     },
     legend: {
       display: true,
@@ -55,7 +56,7 @@ const options = {
     },
     tooltip: {
       callbacks: {
-        label: ({raw}) => sec2min(raw)
+        label: ({raw}) => formatPercent(raw)
       }
     }
   }

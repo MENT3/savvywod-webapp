@@ -2,32 +2,41 @@
 import { ref } from 'vue'
 import colors from 'tailwindcss/colors'
 
-const { data: analysis } = await useAsyncData(() => $fetch(process.env.CORE_API_URL))
-const chartData = ref({
-  labels: analysis.value.round.map((_, i) => `Round ${i+1}`),
-  datasets: [
-    {
-      label: 'Temps de travail',
-      borderWidth: 2,
-      borderColor: colors.blue['800'],
-      backgroundColor: colors.blue['700'],
-      data: analysis.value.round.map(rnd => rnd.w_duration),
-      datalabels: { align: 'end', anchor: 'start' }
-    },
-    {
-      label: 'Temps de transition',
-      borderWidth: 2,
-      borderColor: colors.amber['600'],
-      backgroundColor: colors.amber['500'],
-      data: analysis.value.round.map(rnd => rnd.t_duration),
-      datalabels: { align: 'end', anchor: 'start' }
-    }
-  ]
+const config = useRuntimeConfig()
+const displayInPercent = ref(false)
+const ChartsTimeBar = resolveComponent('ChartsTimeBar')
+const ChartsPercentBar = resolveComponent('ChartsPercentBar')
+
+const { data: analysis } = await useFetch(config.public.coreApiUrl)
+
+const chartData = computed(() => {
+  return {
+    labels: analysis.value.round.map((_, i) => `Round ${i+1}`),
+    datasets: [
+      {
+        label: 'Temps de travail',
+        borderWidth: 2,
+        borderColor: colors.blue['800'],
+        backgroundColor: colors.blue['700'],
+        data: analysis.value.round.map(rnd => rnd[`w_${displayInPercent.value ? 'percent' : 'duration'}`]),
+        datalabels: { align: 'end', anchor: 'start' }
+      },
+      {
+        label: 'Temps de transition',
+        borderWidth: 2,
+        borderColor: colors.amber['600'],
+        backgroundColor: colors.amber['500'],
+        data: analysis.value.round.map(rnd => rnd[`t_${displayInPercent.value ? 'percent' : 'duration'}`]),
+        datalabels: { align: 'end', anchor: 'start' }
+      }
+    ]
+  }
 })
 </script>
 
 <template>
   <div>
+    <UToggle v-model="displayInPercent" />
     <div>
       <div class="mb-2 flex flex-col">
         <span class="block text-sm text-gray-500 uppercase">
@@ -37,7 +46,7 @@ const chartData = ref({
           Analyse par round
         </h3>
       </div>
-      <ChartsTimeBar :data='chartData' />
+      <component :is="displayInPercent ? ChartsPercentBar : ChartsTimeBar" :data="chartData" />
     </div>
   </div>
 </template>
