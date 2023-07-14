@@ -20,7 +20,7 @@ ChartJS.register(
   CategoryScale,
   LinearScale
 )
-const sec_2_min = v => `${Math.floor(v/60).toString().padStart(2, '0')}:${(v%60).toString().padStart(2, '0')}`
+const sec2min = v => `${Math.floor(v/60).toString().padStart(2, '0')}:${(v%60).toString().padStart(2, '0')}`
 
 const props = defineProps({
   data: {
@@ -33,19 +33,30 @@ const options = {
   maintainAspectRatio: false,
   scales: {
     x: { stacked: true },
-    y: { stacked: true }
+    y: {
+      stacked: true,
+      ticks: {
+          stepSize: 60,
+          callback: sec2min
+        }
+    }
   },
   plugins: {
     datalabels: {
       color: colors.white,
       display: context => context.dataset.data[context.dataIndex] > 30,
       font: { weight: 'bold' },
-      formatter: sec_2_min
+      formatter: sec2min
     },
     legend: {
       display: true,
       position: 'bottom',
       align: 'end'
+    },
+    tooltip: {
+      callbacks: {
+        label: ({raw}) => sec2min(raw)
+      }
     }
   }
 }
